@@ -1,0 +1,317 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Private user fitness profile, daily goals, personal records, streak history, and app preferences.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Firebase Auth UID of the profile owner." },
+        "username": { "type": "string", "description": "Display username chosen during onboarding (3-24 chars)." },
+        "avatarId": { "type": "string", "description": "Selected avatar emblem identifier." },
+        "interests": { "type": "array", "description": "Selected fitness interests (Walking, Running, Cycling, Sports, Hydration)." },
+        "dailyStepGoal": { "type": "integer", "description": "Personal daily step target." },
+        "dailyWaterGoalMl": { "type": "integer", "description": "Personal daily water target in milliliters." },
+        "dailyRunGoalKm": { "type": "number", "description": "Personal daily running or cycling target in kilometers." },
+        "dailySportsGoalMin": { "type": "integer", "description": "Personal daily sports or workout target in minutes." },
+        "totalXp": { "type": "integer", "description": "Lifetime accumulated XP." },
+        "level": { "type": "integer", "description": "Current user fitness level derived from XP." },
+        "currentStreak": { "type": "integer", "description": "Current consecutive active days streak." },
+        "bestStreak": { "type": "integer", "description": "Longest consecutive active days streak achieved." },
+        "longestRunKm": { "type": "number", "description": "Personal best single run distance in kilometers." },
+        "bestDailyScore": { "type": "integer", "description": "Highest daily health score achieved (0-1000)." },
+        "totalActivities": { "type": "integer", "description": "Total completed workouts and sports sessions." },
+        "totalStepsLifetime": { "type": "integer", "description": "Total lifetime steps logged." },
+        "unlockedBadges": { "type": "array", "description": "List of unlocked achievement badge IDs." },
+        "activeDates": { "type": "array", "description": "List of YYYY-MM-DD active calendar dates." },
+        "lastActiveDate": { "type": "string", "description": "Most recent active date in YYYY-MM-DD format." },
+        "onboardingCompleted": { "type": "boolean", "description": "Whether onboarding has been completed." },
+        "publicProfile": { "type": "boolean", "description": "Whether the user opts into public leaderboards and friend search." },
+        "notificationsEnabled": { "type": "boolean", "description": "Whether hydration and streak reminders are enabled." },
+        "region": { "type": "string", "description": "User region label for local leaderboards." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp set via FieldValue.serverTimestamp()." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp set via FieldValue.serverTimestamp()." }
+      },
+      "required": [
+        "userId",
+        "username",
+        "avatarId",
+        "interests",
+        "dailyStepGoal",
+        "dailyWaterGoalMl",
+        "dailyRunGoalKm",
+        "dailySportsGoalMin",
+        "totalXp",
+        "level",
+        "currentStreak",
+        "bestStreak",
+        "longestRunKm",
+        "bestDailyScore",
+        "totalActivities",
+        "totalStepsLifetime",
+        "unlockedBadges",
+        "activeDates",
+        "onboardingCompleted",
+        "publicProfile",
+        "notificationsEnabled",
+        "region",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "PublicProfile": {
+      "title": "PublicProfile",
+      "description": "Non-PII public athletic summary used for leaderboards, friend discovery, and social rankings.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Firebase Auth UID of the athlete." },
+        "username": { "type": "string", "description": "Public display username." },
+        "usernameLower": { "type": "string", "description": "Lowercase username for search queries." },
+        "avatarId": { "type": "string", "description": "Avatar emblem ID." },
+        "region": { "type": "string", "description": "Region label for local leaderboard filtering." },
+        "totalXp": { "type": "integer", "description": "Lifetime XP." },
+        "weeklyXp": { "type": "integer", "description": "Weekly competition XP." },
+        "weeklyRunningKm": { "type": "number", "description": "Weekly running kilometers." },
+        "weeklySteps": { "type": "integer", "description": "Weekly steps total." },
+        "weeklySportsMinutes": { "type": "integer", "description": "Weekly sports and workout minutes." },
+        "todayHealthScore": { "type": "integer", "description": "Today's health score out of 1000." },
+        "level": { "type": "integer", "description": "Current fitness level." },
+        "currentStreak": { "type": "integer", "description": "Current active day streak." },
+        "badgeCount": { "type": "integer", "description": "Count of unlocked achievement badges." },
+        "unlockedBadges": { "type": "array", "description": "Unlocked badge IDs." },
+        "publicProfile": { "type": "boolean", "description": "Visibility flag for leaderboards and search." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp set via FieldValue.serverTimestamp()." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp set via FieldValue.serverTimestamp()." }
+      },
+      "required": [
+        "userId",
+        "username",
+        "usernameLower",
+        "avatarId",
+        "region",
+        "totalXp",
+        "weeklyXp",
+        "weeklyRunningKm",
+        "weeklySteps",
+        "weeklySportsMinutes",
+        "todayHealthScore",
+        "level",
+        "currentStreak",
+        "badgeCount",
+        "unlockedBadges",
+        "publicProfile",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "DailyLog": {
+      "title": "DailyLog",
+      "description": "Single-day health progress and 1000-point FitQuest score breakdown.",
+      "type": "object",
+      "properties": {
+        "dateKey": { "type": "string", "description": "Calendar day key in YYYY-MM-DD format." },
+        "steps": { "type": "integer", "description": "Steps recorded today." },
+        "waterMl": { "type": "integer", "description": "Water logged today in milliliters." },
+        "runningKm": { "type": "number", "description": "Running or cycling distance logged today in km." },
+        "sportsMinutes": { "type": "integer", "description": "Sports and workout minutes logged today." },
+        "completedChallengeCount": { "type": "integer", "description": "Number of daily challenges completed today." },
+        "healthScore": { "type": "integer", "description": "Combined daily health score capped at 1000." },
+        "xpEarnedToday": { "type": "integer", "description": "Total XP earned today." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp set via FieldValue.serverTimestamp()." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp set via FieldValue.serverTimestamp()." }
+      },
+      "required": [
+        "dateKey",
+        "steps",
+        "waterMl",
+        "runningKm",
+        "sportsMinutes",
+        "completedChallengeCount",
+        "healthScore",
+        "xpEarnedToday",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "ActivityLog": {
+      "title": "ActivityLog",
+      "description": "Recorded workout or sports session.",
+      "type": "object",
+      "properties": {
+        "activityType": {
+          "type": "string",
+          "enum": ["WALKING", "RUNNING", "CYCLING", "FOOTBALL", "CRICKET", "BADMINTON", "GYM", "OTHER"],
+          "description": "Type of physical activity."
+        },
+        "durationSeconds": { "type": "integer", "description": "Duration in seconds." },
+        "distanceKm": { "type": "number", "description": "Distance covered in kilometers." },
+        "calories": { "type": "integer", "description": "Estimated calories burned." },
+        "stepsEstimated": { "type": "integer", "description": "Estimated steps contributed." },
+        "xpEarned": { "type": "integer", "description": "XP awarded for this session." },
+        "personalBest": { "type": "boolean", "description": "Whether this activity set a personal record." },
+        "dateKey": { "type": "string", "description": "Calendar day key YYYY-MM-DD." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp set via FieldValue.serverTimestamp()." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp set via FieldValue.serverTimestamp()." }
+      },
+      "required": [
+        "activityType",
+        "durationSeconds",
+        "distanceKm",
+        "calories",
+        "stepsEstimated",
+        "xpEarned",
+        "personalBest",
+        "dateKey",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "WaterLog": {
+      "title": "WaterLog",
+      "description": "Individual hydration entry logged by the user.",
+      "type": "object",
+      "properties": {
+        "amountMl": { "type": "integer", "description": "Volume of water consumed in milliliters." },
+        "xpEarned": { "type": "integer", "description": "XP rewarded for this hydration entry." },
+        "dateKey": { "type": "string", "description": "Calendar day key YYYY-MM-DD." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp set via FieldValue.serverTimestamp()." }
+      },
+      "required": ["amountMl", "xpEarned", "dateKey", "createdAt"]
+    },
+    "FriendLink": {
+      "title": "FriendLink",
+      "description": "Saved friend connection under the user's private social graph.",
+      "type": "object",
+      "properties": {
+        "friendUid": { "type": "string", "description": "UID of the connected friend." },
+        "friendUsername": { "type": "string", "description": "Cached username of the friend." },
+        "friendAvatarId": { "type": "string", "description": "Cached avatar ID of the friend." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp set via FieldValue.serverTimestamp()." }
+      },
+      "required": ["friendUid", "friendUsername", "friendAvatarId", "createdAt"]
+    },
+    "FitnessChallenge": {
+      "title": "FitnessChallenge",
+      "description": "Daily, weekly, friend battle, or team fitness challenge.",
+      "type": "object",
+      "properties": {
+        "creatorId": { "type": "string", "description": "UID of the challenge creator." },
+        "title": { "type": "string", "description": "Challenge display title." },
+        "description": { "type": "string", "description": "Short challenge goal description." },
+        "challengeType": {
+          "type": "string",
+          "enum": ["DAILY", "WEEKLY", "FRIEND_BATTLE", "TEAM"],
+          "description": "Category of competition."
+        },
+        "metricType": {
+          "type": "string",
+          "enum": ["STEPS", "RUNNING_KM", "ACTIVE_MINUTES", "WATER_ML", "XP"],
+          "description": "Tracked progress unit."
+        },
+        "targetValue": { "type": "integer", "description": "Target value to win or complete." },
+        "rewardXp": { "type": "integer", "description": "XP reward on completion." },
+        "durationDays": { "type": "integer", "description": "Duration in days." },
+        "status": {
+          "type": "string",
+          "enum": ["ACTIVE", "COMPLETED"],
+          "description": "Lifecycle state of the challenge."
+        },
+        "publicChallenge": { "type": "boolean", "description": "Whether anyone can discover and join." },
+        "participantIds": { "type": "array", "description": "List of participating user UIDs." },
+        "combinedProgress": { "type": "integer", "description": "Accumulated progress toward targetValue." },
+        "teamName": { "type": "string", "description": "Team or squad name if team challenge." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp set via FieldValue.serverTimestamp()." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp set via FieldValue.serverTimestamp()." }
+      },
+      "required": [
+        "creatorId",
+        "title",
+        "description",
+        "challengeType",
+        "metricType",
+        "targetValue",
+        "rewardXp",
+        "durationDays",
+        "status",
+        "publicChallenge",
+        "participantIds",
+        "combinedProgress",
+        "teamName",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "FeedPost": {
+      "title": "FeedPost",
+      "description": "Social fitness achievement update with emoji reactions.",
+      "type": "object",
+      "properties": {
+        "authorId": { "type": "string", "description": "UID of the athlete who posted the update." },
+        "authorUsername": { "type": "string", "description": "Public username of the author." },
+        "authorAvatarId": { "type": "string", "description": "Avatar ID of the author." },
+        "message": { "type": "string", "description": "Activity highlight message." },
+        "category": {
+          "type": "string",
+          "enum": ["RUN", "SPORT", "WATER", "BADGE", "CHALLENGE", "STREAK"],
+          "description": "Update category."
+        },
+        "xpEarned": { "type": "integer", "description": "XP highlight for this post." },
+        "publicFeed": { "type": "boolean", "description": "Whether visible in the community and friends feed." },
+        "fireCount": { "type": "integer", "description": "Count of fire emoji reactions." },
+        "clapCount": { "type": "integer", "description": "Count of clap emoji reactions." },
+        "boltCount": { "type": "integer", "description": "Count of lightning bolt emoji reactions." },
+        "reactedUserIds": { "type": "array", "description": "Bounded list of UIDs who reacted." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp set via FieldValue.serverTimestamp()." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp set via FieldValue.serverTimestamp()." }
+      },
+      "required": [
+        "authorId",
+        "authorUsername",
+        "authorAvatarId",
+        "message",
+        "category",
+        "xpEarned",
+        "publicFeed",
+        "fireCount",
+        "clapCount",
+        "boltCount",
+        "reactedUserIds",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Private owner-only user fitness profile, daily targets, lifetime stats, and preferences."
+    },
+    "/public_profiles/{userId}": {
+      "schema": { "$ref": "#/entities/PublicProfile" },
+      "description": "Public non-PII athletic leaderboard and friend discovery profile."
+    },
+    "/users/{userId}/daily_logs/{dateKey}": {
+      "schema": { "$ref": "#/entities/DailyLog" },
+      "description": "Owner-only daily fitness logs keyed by YYYY-MM-DD."
+    },
+    "/users/{userId}/activities/{activityId}": {
+      "schema": { "$ref": "#/entities/ActivityLog" },
+      "description": "Owner-only logged exercise and sports history."
+    },
+    "/users/{userId}/water_logs/{logId}": {
+      "schema": { "$ref": "#/entities/WaterLog" },
+      "description": "Owner-only water intake log entries."
+    },
+    "/users/{userId}/friends/{friendUid}": {
+      "schema": { "$ref": "#/entities/FriendLink" },
+      "description": "Owner-only saved friends list."
+    },
+    "/challenges/{challengeId}": {
+      "schema": { "$ref": "#/entities/FitnessChallenge" },
+      "description": "Shared daily, weekly, friend battle, and team fitness challenges."
+    },
+    "/feed_posts/{postId}": {
+      "schema": { "$ref": "#/entities/FeedPost" },
+      "description": "Social activity feed updates with emoji reactions."
+    }
+  }
+}

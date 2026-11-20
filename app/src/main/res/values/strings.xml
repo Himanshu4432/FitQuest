@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">FitQuest</string>
+    <string name="tagline">Level Up Your Life.</string>
+    <string name="sign_in_google">Continue with Google</string>
+    <string name="tab_home">Home</string>
+    <string name="tab_activity">Activity</string>
+    <string name="tab_compete">Compete</string>
+    <string name="tab_rewards">Rewards</string>
+    <string name="tab_profile">Profile</string>
+    <string name="water_tracker_title">Hydration Quest</string>
+    <string name="daily_summary_title">Daily Summary</string>
+    <string name="share_score_card">Share Score Card</string>
+    <string name="sign_out">Sign Out</string>
+</resources>

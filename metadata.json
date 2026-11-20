@@ -1,0 +1,6 @@
+{
+  "name": "FitQuest",
+  "description": "Gamified social health and fitness app where everyday movement, sports, and hydration earn XP, daily health scores, badges, streaks, and leaderboard rankings.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
