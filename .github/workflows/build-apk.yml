@@ -1,67 +1,119 @@
-
-name: Build FitQuest APK
+name: Build FitQuest Android APK
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
-
-permissions:
-  contents: read
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
 
 jobs:
-  build:
-    name: Build Android APK
+  build-debug-apk:
+    name: Build Debug APK
     runs-on: ubuntu-latest
-    timeout-minutes: 45
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Java 17
+      - name: Set up JDK 21 (Temurin)
         uses: actions/setup-java@v4
         with:
-          distribution: temurin
-          java-version: '17'
+          distribution: 'temurin'
+          java-version: '21'
 
-      - name: Set up Gradle
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install required Android SDK platforms and build tools
+        run: |
+          yes | sdkmanager --licenses > /dev/null 2>&1 || true
+          sdkmanager \
+            "platform-tools" \
+            "build-tools;36.0.0" \
+            "platforms;android-36" \
+            "platforms;android-36.1"
+
+      - name: Set up Gradle 9.3.1
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '9.3.1'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v4
-        with:
-          packages: 'platform-tools'
-
-      - name: Install Android SDK
+      - name: Configure Firebase google-services.json
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+          GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
         run: |
-          sdkmanager --install \
-            "platforms;android-36.1" \
-            "build-tools;36.0.0"
+          if [ -n "$GOOGLE_SERVICES_JSON" ]; then
+            echo "Writing app/google-services.json from GOOGLE_SERVICES_JSON secret"
+            printf '%s' "$GOOGLE_SERVICES_JSON" > app/google-services.json
+          elif [ -n "$GOOGLE_SERVICES_JSON_BASE64" ]; then
+            echo "Decoding app/google-services.json from GOOGLE_SERVICES_JSON_BASE64 secret"
+            printf '%s' "$GOOGLE_SERVICES_JSON_BASE64" | base64 -d > app/google-services.json
+          elif [ -f "app/google-services.json" ]; then
+            echo "Using app/google-services.json from repository"
+          else
+            echo "::error::Missing app/google-services.json! Without it, the Google Services plugin cannot generate R.string.default_web_client_id."
+            echo "Fix: Download google-services.json from Firebase Console (project gen-lang-client-0218583804, app com.aistudio.fitquest.kxmqvr) and add its contents as a GitHub Repository Secret named GOOGLE_SERVICES_JSON."
+            exit 1
+          fi
 
-      - name: Generate debug keystore
+          python3 -c 'import json, sys; data = json.load(open("app/google-services.json", encoding="utf-8")); matched = [c for c in data.get("client", []) if c.get("client_info", {}).get("android_client_info", {}).get("package_name") == "com.aistudio.fitquest.kxmqvr"]; sys.exit("Missing package_name com.aistudio.fitquest.kxmqvr in google-services.json") if not matched else None; has_web = any(o.get("client_type") == 3 and o.get("client_id") for o in matched[0].get("oauth_client", [])); sys.exit("Missing Web OAuth client (client_type: 3) needed for default_web_client_id") if not has_web else print("Validated app/google-services.json (package matches & Web OAuth client_type=3 present).")'
+
+      - name: Verify Firestore named database config
+        env:
+          FIRESTORE_DATABASE_ID: ${{ secrets.FIRESTORE_DATABASE_ID }}
         run: |
-          keytool -genkeypair -noprompt \
-            -keystore "$GITHUB_WORKSPACE/debug.keystore" \
-            -storepass android \
-            -keypass android \
-            -alias androiddebugkey \
-            -keyalg RSA \
-            -keysize 2048 \
-            -validity 10000 \
-            -dname "CN=Android Debug,O=Android,C=US"
+          CONFIG_FILE="app/src/main/res/values/firebase_applet_config.xml"
+          if [ ! -f "$CONFIG_FILE" ]; then
+            DB_ID="${FIRESTORE_DATABASE_ID:-ai-studio-android-fitquest-3f9ab377-3be5-4e24-954b-0670d8affb76}"
+            mkdir -p app/src/main/res/values
+            printf '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <string name="firestore_database_id" translatable="false">%s</string>\n</resources>\n' "$DB_ID" > "$CONFIG_FILE"
+            echo "Created $CONFIG_FILE"
+          else
+            echo "Using existing $CONFIG_FILE"
+          fi
+
+      - name: Prepare debug signing keystore
+        env:
+          DEBUG_KEYSTORE_BASE64: ${{ secrets.DEBUG_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$DEBUG_KEYSTORE_BASE64" ]; then
+            echo "Decoding debug.keystore from DEBUG_KEYSTORE_BASE64 secret"
+            printf '%s' "$DEBUG_KEYSTORE_BASE64" | base64 -d > debug.keystore
+          elif [ -f "debug.keystore" ]; then
+            echo "Using existing debug.keystore"
+          elif [ -f "debug.keystore.base64" ]; then
+            echo "Decoding debug.keystore from debug.keystore.base64"
+            base64 -d debug.keystore.base64 > debug.keystore
+          else
+            echo "::warning::No persistent debug keystore secret found; generating a fresh debug.keystore. Register its SHA-1 below in Firebase Console for Google Sign-In, or save a persistent keystore as DEBUG_KEYSTORE_BASE64."
+            keytool -genkeypair -v \
+              -keystore debug.keystore \
+              -storepass android \
+              -alias androiddebugkey \
+              -keypass android \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+          fi
+
+          echo "Active APK Debug Signing Certificate Fingerprints:"
+          keytool -list -v -keystore debug.keystore -alias androiddebugkey -storepass android -keypass android | grep -E "SHA1:|SHA256:"
 
       - name: Build Debug APK
-        run: gradle --no-daemon :app:assembleDebug
+        run: gradle :app:assembleDebug --stacktrace
 
-      - name: Upload APK
+      - name: Verify APK output
+        run: |
+          ls -lh app/build/outputs/apk/debug/
+          test -f app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Upload FitQuest Debug APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: FitQuest-debug-apk
-          path: app/build/outputs/apk/debug/*.apk
-          if-no-files-found: error
+          path: app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
-          
+          if-no-files-found: error
